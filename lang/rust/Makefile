@@ -25,6 +25,13 @@ include $(INCLUDE_DIR)/host-build.mk
 include $(INCLUDE_DIR)/package.mk
 include ./rust-values.mk
 
+define Host/Prepare
+	$(call Host/Prepare/Default)
+	# 修复 Cargo.toml.orig 被删除导致的 checksum 校验失败
+	find $(HOST_BUILD_DIR)/vendor -name '.cargo-checksum.json' -exec \
+		sed -i -E 's/"Cargo.toml\.orig":"[a-f0-9]+",?//g' {} + 2>/dev/null || true
+endef
+
 define Package/rust
   SECTION:=lang
   CATEGORY:=Languages
